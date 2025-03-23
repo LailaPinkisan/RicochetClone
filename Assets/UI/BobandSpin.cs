@@ -6,7 +6,7 @@ public class BobandSpin : MonoBehaviour
     public float rotationSpeed = 50f;
 
     [Header("Bob Settings")]
-    public float bobHeight = 0.5f; // height of the bobbing motion
+    public float bobHeight = 0.2f; // height of the bobbing motion
     public float bobSpeed = 2f; // Speed of bobbing
 
     private Vector3 startPosition;

@@ -22,7 +22,7 @@ public class ThrowingMechanic : MonoBehaviour
 
     [Header("Settings")]
     public int totalThrows = 3;
-    private int currentThrows;
+    public int currentThrows;
     public float throwCooldown = 0.1f;
     public float reloadTime = 3f;
 
@@ -35,7 +35,7 @@ public class ThrowingMechanic : MonoBehaviour
     private bool reloading = false;
 
     // Power-up handling
-    private PowerUpType activePowerUp = PowerUpType.None;
+    public static PowerUpType activePowerUp = PowerUpType.None;
     private int powerUpShots = 0;
 
     void Start()
@@ -46,7 +46,6 @@ public class ThrowingMechanic : MonoBehaviour
 
         // initialize UI
         shurikenUI.UpdateShurikenUI(currentThrows);
-        UpdateDiscUI();
     }
 
     private void Update()
@@ -75,6 +74,10 @@ public class ThrowingMechanic : MonoBehaviour
         else
         {
             currentThrows--;
+            if (currentThrows == 0)
+            {
+                shurikenUI.ClearPowerUpUI();
+            }
         }
 
         //  Create a ray from the PlayerCam's position, facing forward
@@ -94,12 +97,6 @@ public class ThrowingMechanic : MonoBehaviour
 
         projectileRb.linearVelocity = forceDirection * adjustedThrowForce;
 
-        //  Apply effect based on power-up
-        Shuriken shurikenScript = projectile.GetComponent<Shuriken>();
-        if (activePowerUp == PowerUpType.FreezeShot || activePowerUp == PowerUpType.FastFreezeShot)
-        {
-            shurikenScript.ApplyFreezeEffect(); // Create this in Shuriken.cs
-        }
 
         //  Update UI
         shurikenUI.UpdateShurikenUI(currentThrows);
@@ -154,6 +151,8 @@ public class ThrowingMechanic : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
         }
 
+        shurikenUI.ClearPowerUpUI();
+
         //  Start reload if necessary
         if (currentThrows <= 0 && !reloading)
         {
@@ -201,15 +200,12 @@ public class ThrowingMechanic : MonoBehaviour
         {
             case PowerUpType.FastShot:
                 throwForce = baseThrowForce * 1.5f;
-                shurikenUI.SetPowerUpUI("Fast Shot", Color.cyan);
                 break;
             case PowerUpType.FreezeShot:
                 throwForce = baseThrowForce;
-                shurikenUI.SetPowerUpUI("Freeze Shot", Color.blue);
                 break;
             case PowerUpType.FastFreezeShot:
                 throwForce = baseThrowForce * 1.5f;
-                shurikenUI.SetPowerUpUI("Fast Freeze Shot", new Color(0.5f, 0.2f, 1f));
                 break;
             default:
                 throwForce = baseThrowForce;
@@ -217,8 +213,6 @@ public class ThrowingMechanic : MonoBehaviour
                 break;
         }
 
-        // Update UI icon
-        UpdateDiscUI();
     }
 
     // Disable power-up
@@ -226,43 +220,8 @@ public class ThrowingMechanic : MonoBehaviour
     {
         activePowerUp = PowerUpType.None;
         throwForce = baseThrowForce;
-        shurikenUI.ClearPowerUpUI();
-        UpdateDiscUI();
     }
 
-    // Get the color for each power-up
-    private Color GetPowerUpColor(PowerUpType type)
-    {
-        switch (type)
-        {
-            case PowerUpType.FastShot:
-                return Color.cyan;
-            case PowerUpType.FreezeShot:
-                return Color.blue;
-            case PowerUpType.FastFreezeShot:
-                return new Color(0.5f, 0.2f, 1f);
-            default:
-                return Color.white;
-        }
-    }
-    private void UpdateDiscUI()
-    {
-        switch (activePowerUp)
-        {
-            case PowerUpType.FastShot:
-                discIconUI.sprite = fastShotIcon;
-                break;
-            case PowerUpType.FreezeShot:
-                discIconUI.sprite = freezeShotIcon;
-                break;
-            case PowerUpType.FastFreezeShot:
-                discIconUI.sprite = fastFreezeShotIcon;
-                break;
-            default:
-                discIconUI.sprite = normalDiscIcon;
-                break;
-        }
-    }
     // Define Power-Up Types
     public enum PowerUpType
     {
