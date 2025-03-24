@@ -228,7 +228,9 @@ public class ThrowingMechanic : MonoBehaviour
         None,
         FastShot,
         FreezeShot,
-        FastFreezeShot
+        FastFreezeShot,
+        PowerShot,
+        TripleShot
     }
 
 

@@ -10,6 +10,8 @@ public class ShurikenUIManager : MonoBehaviour
 
     public Sprite fastShotShuriken;
     public Sprite freezeShotShuriken;
+    public Sprite powerShotShuriken;
+    public Sprite tripleShotShuriken;
 
     [Header("Power-Up UI")]
     public TextMeshProUGUI powerUpLabel;
@@ -42,10 +44,11 @@ public class ShurikenUIManager : MonoBehaviour
     {
         powerUpText.text = powerUpName;
         powerUpText.color = GetPowerUpColor(powerUpName);
-        powerUpText.color = Color.red;
+        powerUpText.color = new Color(48f, 48f, 48f);
         for (int i = 0; i < shurikenIcons.Length; i++)
         {
-            shurikenIcons[i].sprite = powerUpName == "FastShot" ? fastShotShuriken : powerUpName == "FreezeShot" ? freezeShotShuriken : normalShuriken;
+            shurikenIcons[i].sprite = powerUpName == "FastShot" ? fastShotShuriken : powerUpName == "FreezeShot" ? 
+            freezeShotShuriken : powerUpName == "PowerShot" ? powerShotShuriken : powerUpName == "TripleShot" ? tripleShotShuriken : normalShuriken;
         }
     }
 
@@ -68,7 +71,7 @@ public class ShurikenUIManager : MonoBehaviour
     // ✅ Reset UI to normal state after power-up ends
     public void ClearPowerUpUI()
     {
-        powerUpText.text = "Default";
+        powerUpText.text = "NormalDisc";
     }
     
 }

@@ -38,26 +38,26 @@ public class PowerUp : MonoBehaviour
         // Example effect logic based on prefab tag or name
         if (prefab.CompareTag("FastShot"))
         {
-            Debug.Log("Fast Shot collected!"); // ✅ Example feedback
             // player.GetComponent<PlayerController>().ActivateFastShot(); // Example use
             ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.FastShot;
             shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.FastShot.ToString());
         }
-        else if (prefab.CompareTag("FreezeShot"))
+        else if (prefab.CompareTag("FreezeShot") || gameObject.layer == LayerMask.NameToLayer("FreezeShot"))
         {
-            Debug.Log("Freeze Shot collected!");
             // player.GetComponent<PlayerController>().ActivateFreezeShot();
             ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.FreezeShot;
             shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.FreezeShot.ToString());
         }
         else if (prefab.CompareTag("PowerShot"))
         {
-            Debug.Log("Power Shot collected!");
+            ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.PowerShot;
+            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.PowerShot.ToString());
             // player.GetComponent<PlayerController>().ActivatePowerShot();
         }
         else if (prefab.CompareTag("TripleShot"))
         {
-            Debug.Log("Triple Shot collected!");
+            ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.TripleShot;
+            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.TripleShot.ToString());
             // player.GetComponent<PlayerController>().ActivateTripleShot();
         }
 
