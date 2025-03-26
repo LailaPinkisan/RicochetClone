@@ -21,44 +21,41 @@ public class PowerUp : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            if (other.CompareTag("Player"))
-            {
-                ApplyEffect(other.gameObject);
+            ApplyEffect(other.gameObject);
 
-                // Notify spawner that the power-up is collected
-                Destroy(gameObject);
-            }
+            // Notify spawner that the power-up is collected
+            Destroy(gameObject);
         }
     }
 
     void ApplyEffect(GameObject player)
     {
         ResetThrowUI();
-        
+
         // Example effect logic based on prefab tag or name
         if (prefab.CompareTag("FastShot"))
         {
             // player.GetComponent<PlayerController>().ActivateFastShot(); // Example use
-            ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.FastShot;
-            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.FastShot.ToString());
+            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.FastShot);
+            throwmechanic.ActivatePowerUp(ThrowingMechanic.PowerUpType.FastShot);
         }
         else if (gameObject.layer == LayerMask.NameToLayer("FreezeShot"))
         {
             // player.GetComponent<PlayerController>().ActivateFreezeShot();
-            ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.FreezeShot;
-            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.FreezeShot.ToString());
+            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.FreezeShot);
+            throwmechanic.ActivatePowerUp(ThrowingMechanic.PowerUpType.FreezeShot);
         }
         else if (prefab.CompareTag("PowerShot"))
         {
-            ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.PowerShot;
-            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.PowerShot.ToString());
+            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.PowerShot);
             // player.GetComponent<PlayerController>().ActivatePowerShot();
+            throwmechanic.ActivatePowerUp(ThrowingMechanic.PowerUpType.PowerShot);
         }
         else if (prefab.CompareTag("TripleShot"))
         {
-            ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.TripleShot;
-            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.TripleShot.ToString());
+            shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.TripleShot);
             // player.GetComponent<PlayerController>().ActivateTripleShot();
+            throwmechanic.ActivatePowerUp(ThrowingMechanic.PowerUpType.TripleShot);
         }
 
         // Optional: Add a sound or VFX on collection

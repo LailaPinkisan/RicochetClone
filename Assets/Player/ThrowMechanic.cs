@@ -87,14 +87,8 @@ public class ThrowingMechanic : MonoBehaviour
         // Instantiate the shuriken
         GameObject projectile = Instantiate(shurikenPrefab, ray.origin, Quaternion.LookRotation(forceDirection));
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-        //  Adjust throw force based on power-up
-        float adjustedThrowForce = throwForce;
-        if (activePowerUp == PowerUpType.FastShot || activePowerUp == PowerUpType.FastFreezeShot)
-        {
-            adjustedThrowForce *= 1.5f;
-        }
 
-        projectileRb.linearVelocity = forceDirection * adjustedThrowForce;
+        projectileRb.linearVelocity = forceDirection * throwForce;
 
 
         //  Update UI
@@ -193,7 +187,6 @@ public class ThrowingMechanic : MonoBehaviour
     public void ActivatePowerUp(PowerUpType newPowerUp)
     {
         activePowerUp = newPowerUp;
-        powerUpShots = 3;
         Debug.Log("ActivatePowerUp called with: " + newPowerUp);
         switch (activePowerUp)
         {
@@ -208,6 +201,10 @@ public class ThrowingMechanic : MonoBehaviour
             case PowerUpType.FastFreezeShot:
                 throwForce = baseThrowForce * 4f;
 
+                break;
+            case PowerUpType.PowerShot:
+                break;
+            case PowerUpType.TripleShot:
                 break;
             default:
                 throwForce = baseThrowForce;

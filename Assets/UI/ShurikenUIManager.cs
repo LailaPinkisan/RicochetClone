@@ -40,31 +40,51 @@ public class ShurikenUIManager : MonoBehaviour
     }
 
     // ✅ Show the active power-up in UI
-    public void SetPowerUpUI(string powerUpName)
+    public void SetPowerUpUI(ThrowingMechanic.PowerUpType newPowerUp)
     {
-        powerUpText.text = powerUpName;
-        powerUpText.color = GetPowerUpColor(powerUpName);
+        powerUpText.text = GetPowerUpText(newPowerUp);
         powerUpText.color = new Color(48f, 48f, 48f);
         for (int i = 0; i < shurikenIcons.Length; i++)
         {
-            shurikenIcons[i].sprite = powerUpName == "FastShot" ? fastShotShuriken : powerUpName == "FreezeShot" ? 
-            freezeShotShuriken : powerUpName == "PowerShot" ? powerShotShuriken : powerUpName == "TripleShot" ? tripleShotShuriken : normalShuriken;
+            shurikenIcons[i].sprite = GetPowerUpIcon(newPowerUp);
         }
     }
 
-    // Get the color for each power-up
-    private Color GetPowerUpColor(string powerUpName)
+    private string GetPowerUpText(ThrowingMechanic.PowerUpType powerUp)
     {
-        switch (powerUpName)
+        switch (powerUp)
         {
-            case "FastShot":
-                return Color.cyan;
-            case "FreezeShot":
-                return Color.blue;
-            case "FastFreezeShot":
-                return new Color(0.5f, 0.2f, 1f);
+            case ThrowingMechanic.PowerUpType.FastShot:
+                return "Fast Shot";
+            case ThrowingMechanic.PowerUpType.FreezeShot:
+                return "Freeze Shot";
+            case ThrowingMechanic.PowerUpType.FastFreezeShot:
+                return "Fast Freeze Shot";
+            case ThrowingMechanic.PowerUpType.PowerShot:
+                return "Power Shot";
+            case ThrowingMechanic.PowerUpType.TripleShot:
+                return "Triple Shot";
             default:
-                return Color.white;
+                return "Normal Disc";
+        }
+    }
+
+    private Sprite GetPowerUpIcon(ThrowingMechanic.PowerUpType powerUp)
+    {
+        switch (powerUp)
+        {
+            case ThrowingMechanic.PowerUpType.FastShot:
+                return fastShotShuriken;
+            case ThrowingMechanic.PowerUpType.FreezeShot:
+                return freezeShotShuriken;
+            case ThrowingMechanic.PowerUpType.FastFreezeShot:
+                return freezeShotShuriken; // TODO implement fastFreezeShotShuriken
+            case ThrowingMechanic.PowerUpType.PowerShot:
+                return powerShotShuriken;
+            case ThrowingMechanic.PowerUpType.TripleShot:
+                return tripleShotShuriken;
+            default:
+                return normalShuriken;
         }
     }
 
