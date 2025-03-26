@@ -29,8 +29,8 @@ public class ThrowingMechanic : MonoBehaviour
     [Header("Throwing")]
     public KeyCode throwKey = KeyCode.Mouse0;
     public KeyCode threeKey = KeyCode.Mouse1;
-    private float baseThrowForce = 7f;
-    private float throwForce;
+    public float baseThrowForce = 10f;
+    public float throwForce;
     private bool readyToThrow;
     private bool reloading = false;
 
@@ -87,7 +87,6 @@ public class ThrowingMechanic : MonoBehaviour
         // Instantiate the shuriken
         GameObject projectile = Instantiate(shurikenPrefab, ray.origin, Quaternion.LookRotation(forceDirection));
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-
         //  Adjust throw force based on power-up
         float adjustedThrowForce = throwForce;
         if (activePowerUp == PowerUpType.FastShot || activePowerUp == PowerUpType.FastFreezeShot)
@@ -195,17 +194,20 @@ public class ThrowingMechanic : MonoBehaviour
     {
         activePowerUp = newPowerUp;
         powerUpShots = 3;
-
+        Debug.Log("ActivatePowerUp called with: " + newPowerUp);
         switch (activePowerUp)
         {
             case PowerUpType.FastShot:
-                throwForce = baseThrowForce * 1.5f;
+                throwForce = baseThrowForce * 4f;
+                Debug.Log("Fast Shot power-up activated! Throw force: " + throwForce);
                 break;
             case PowerUpType.FreezeShot:
                 throwForce = baseThrowForce;
+            
                 break;
             case PowerUpType.FastFreezeShot:
-                throwForce = baseThrowForce * 1.5f;
+                throwForce = baseThrowForce * 4f;
+
                 break;
             default:
                 throwForce = baseThrowForce;
@@ -232,6 +234,4 @@ public class ThrowingMechanic : MonoBehaviour
         PowerShot,
         TripleShot
     }
-
-
 }

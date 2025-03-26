@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     public bool isPlayer = true; // Default is player
     public float groundY;
     [Header("Movement")]
-    public float moveSpeed;
+    public float moveSpeed = 250f;
     public float maxSpeed = 15f;
     public float airControl = 0.5f;
     public float airDrag = 1f;
@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Jump & Height Clamp")]
     public float maxHeight = 12f;
-    private bool disableClamp = false; 
+    private bool disableClamp = false;
     [Header("Ground Check")]
     public float playerHeight;
     public LayerMask whatIsGround;
@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
     Vector3 moveDirection;
 
     Rigidbody rb;
-    
+
 
     void Start()
     {
@@ -60,7 +60,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.LogError("Player Collider not found!");
         }
-        
+
         if (Input.GetMouseButtonDown(0)) // Left Click
         {
             StartCoroutine(ThrowAnimation(false)); // Normal throw
@@ -78,17 +78,17 @@ public class PlayerMovement : MonoBehaviour
         {
             anim.SetBool("isFalling", false);
         }
-            MyInput();
-            ApplyDrag();
-            SpeedControl();
-            ClampHeight();
+        MyInput();
+        ApplyDrag();
+        SpeedControl();
+        ClampHeight();
 
-            UpdateAnimations();
-            // handle drag
-            if (grounded)
-                Debug.Log("Grounded");
-            else
-                Debug.Log("Airborne");
+        UpdateAnimations();
+        // handle drag
+        if (grounded)
+            Debug.Log("Grounded");
+        else
+            Debug.Log("Airborne");
     }
     void FixedUpdate()
     {
@@ -101,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
     }
 
-     private void MovePlayer()
+    private void MovePlayer()
     {
         // calculate movement direction
         // moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
@@ -122,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
             rb.AddForce(airMove, ForceMode.Force);
         }
     }
- 
+
     private void ApplyDrag()
     {
         // Apply ground or air drag...get horizontal velocity only 
@@ -135,7 +135,7 @@ public class PlayerMovement : MonoBehaviour
         // Preserve vertical velocity (gravity should remain strong)
         rb.linearVelocity = new Vector3(horizontalVelocity.x, rb.linearVelocity.y, horizontalVelocity.z);
     }
-     private void SpeedControl()
+    private void SpeedControl()
     {
         // Get current horizontal speed
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
@@ -156,14 +156,14 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-       private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("LaunchPad"))
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 20f, rb.linearVelocity.z);
         }
     }
-     private void LimitSpeed()
+    private void LimitSpeed()
     {
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // Ignore Y (jumping)
 
@@ -179,32 +179,34 @@ public class PlayerMovement : MonoBehaviour
     {
         disableClamp = disable;
     }
- 
+
     private void UpdateAnimations()
     {
         //Get horizontal movemnt speed
         float horizontalSpeed = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude;
 
-        // set animation [parameters]
-        anim.SetFloat("Speed", horizontalSpeed); // speed affects running and idle transition
-        anim.SetBool("Jump", !grounded);// jump is true if not grounded
-        anim.SetBool("IsGrounded", grounded); // helps return from jump
+        if (anim != null)
+        {
+            anim.SetFloat("Speed", horizontalSpeed);
+            anim.SetBool("Jump", !grounded);
+            anim.SetBool("IsGrounded", grounded);
+        }
     }
 
     IEnumerator ThrowAnimation(bool isRightClick)
-{
-    if (isRightClick)
     {
-        anim.SetBool("isRightThrow", true); // Right-click throw animation
-        yield return new WaitForSeconds(0.1f);
-        anim.SetBool("isRightThrow", false);
+        if (isRightClick)
+        {
+            anim.SetBool("isRightThrow", true); // Right-click throw animation
+            yield return new WaitForSeconds(0.1f);
+            anim.SetBool("isRightThrow", false);
+        }
+        else
+        {
+            anim.SetBool("isThrow", true); // Left-click throw animation
+            yield return new WaitForSeconds(0.1f);
+            anim.SetBool("isThrow", false);
+        }
     }
-    else
-    {
-        anim.SetBool("isThrow", true); // Left-click throw animation
-        yield return new WaitForSeconds(0.1f);
-        anim.SetBool("isThrow", false);
-    }
-}
 
 }

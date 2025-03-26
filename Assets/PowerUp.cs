@@ -34,7 +34,7 @@ public class PowerUp : MonoBehaviour
     void ApplyEffect(GameObject player)
     {
         ResetThrowUI();
-
+        
         // Example effect logic based on prefab tag or name
         if (prefab.CompareTag("FastShot"))
         {
@@ -42,7 +42,7 @@ public class PowerUp : MonoBehaviour
             ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.FastShot;
             shurikenUI.SetPowerUpUI(ThrowingMechanic.PowerUpType.FastShot.ToString());
         }
-        else if (prefab.CompareTag("FreezeShot") || gameObject.layer == LayerMask.NameToLayer("FreezeShot"))
+        else if (gameObject.layer == LayerMask.NameToLayer("FreezeShot"))
         {
             // player.GetComponent<PlayerController>().ActivateFreezeShot();
             ThrowingMechanic.activePowerUp = ThrowingMechanic.PowerUpType.FreezeShot;
