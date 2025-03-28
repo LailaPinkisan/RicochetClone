@@ -36,7 +36,7 @@ public class ThrowingMechanic : MonoBehaviour
 
     // Power-up handling
     public static PowerUpType activePowerUp = PowerUpType.None;
-    private int powerUpShots = 0;
+    private int powerUpShots = 3;
 
     void Start()
     {
@@ -67,9 +67,15 @@ public class ThrowingMechanic : MonoBehaviour
         readyToThrow = false;
 
         //  Reduce ammo count properly
-        if (activePowerUp != PowerUpType.None && powerUpShots > 0)
+        if (activePowerUp != PowerUpType.None)
         {
             powerUpShots--;
+            currentThrows--;
+            // If power-up shots are depleted, disable power-up
+            if (powerUpShots <= 0)
+            {
+                DisablePowerUp();
+            }
         }
         else
         {
@@ -129,13 +135,22 @@ public class ThrowingMechanic : MonoBehaviour
             projectileRb.linearVelocity = spreadDirection * throwForce;
 
             //  Reduce ammo count properly based on power-up status
-            if (activePowerUp != PowerUpType.None && powerUpShots > 0)
+            if (activePowerUp != PowerUpType.None)
             {
+                currentThrows--;
                 powerUpShots--;
+                // If power-up shots are depleted, disable power-up
+                if (powerUpShots <= 0)
+                {
+                    DisablePowerUp();
+                }
             }
             else
             {
                 currentThrows--;
+                {
+                    shurikenUI.ClearPowerUpUI();
+                }
             }
 
             //  Update UI after each throw
@@ -187,7 +202,11 @@ public class ThrowingMechanic : MonoBehaviour
     public void ActivatePowerUp(PowerUpType newPowerUp)
     {
         activePowerUp = newPowerUp;
-        Debug.Log("ActivatePowerUp called with: " + newPowerUp);
+        powerUpShots = 3;
+        currentThrows = 3;
+
+        shurikenUI.UpdateShurikenUI(currentThrows);
+
         switch (activePowerUp)
         {
             case PowerUpType.FastShot:
@@ -196,15 +215,17 @@ public class ThrowingMechanic : MonoBehaviour
                 break;
             case PowerUpType.FreezeShot:
                 throwForce = baseThrowForce;
-            
+
                 break;
             case PowerUpType.FastFreezeShot:
                 throwForce = baseThrowForce * 4f;
 
                 break;
             case PowerUpType.PowerShot:
+                throwForce = baseThrowForce;
                 break;
             case PowerUpType.TripleShot:
+                throwForce = baseThrowForce;
                 break;
             default:
                 throwForce = baseThrowForce;
@@ -219,6 +240,7 @@ public class ThrowingMechanic : MonoBehaviour
     {
         activePowerUp = PowerUpType.None;
         throwForce = baseThrowForce;
+        shurikenUI.ClearPowerUpUI(); // Clear power-up UI
     }
 
     // Define Power-Up Types
