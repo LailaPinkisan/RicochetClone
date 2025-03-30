@@ -10,6 +10,7 @@ public class ShurikenUIManager : MonoBehaviour
 
     public Sprite fastShotShuriken;
     public Sprite freezeShotShuriken;
+
     public Sprite powerShotShuriken;
     public Sprite tripleShotShuriken;
 
@@ -58,8 +59,6 @@ public class ShurikenUIManager : MonoBehaviour
                 return "Fast Shot";
             case ThrowingMechanic.PowerUpType.FreezeShot:
                 return "Freeze Shot";
-            case ThrowingMechanic.PowerUpType.FastFreezeShot:
-                return "Fast Freeze Shot";
             case ThrowingMechanic.PowerUpType.PowerShot:
                 return "Power Shot";
             case ThrowingMechanic.PowerUpType.TripleShot:
@@ -77,8 +76,6 @@ public class ShurikenUIManager : MonoBehaviour
                 return fastShotShuriken;
             case ThrowingMechanic.PowerUpType.FreezeShot:
                 return freezeShotShuriken;
-            case ThrowingMechanic.PowerUpType.FastFreezeShot:
-                return freezeShotShuriken; // TODO implement fastFreezeShotShuriken
             case ThrowingMechanic.PowerUpType.PowerShot:
                 return powerShotShuriken;
             case ThrowingMechanic.PowerUpType.TripleShot:
@@ -91,7 +88,7 @@ public class ShurikenUIManager : MonoBehaviour
     // ✅ Reset UI to normal state after power-up ends
     public void ClearPowerUpUI()
     {
-        powerUpText.text = "NormalDisc";
+        powerUpText.text = "Normal Disc";
     }
     
 }

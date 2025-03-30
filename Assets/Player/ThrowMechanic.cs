@@ -12,19 +12,14 @@ public class ThrowingMechanic : MonoBehaviour
     public GameObject shurikenPrefab;
     public Image discIconUI;
     public ShurikenUIManager shurikenUI;
-
-    [Header("Shuriken Sprites")]
-    public Sprite normalDiscIcon;
-    public Sprite fastShotIcon;
-    public Sprite freezeShotIcon;
-    public Sprite fastFreezeShotIcon;
-
+    public PlayerMovement playerMovement;
 
     [Header("Settings")]
     public int totalThrows = 3;
     public int currentThrows;
     public float throwCooldown = 0.1f;
     public float reloadTime = 3f;
+    // public int powerUpShots;
 
     [Header("Throwing")]
     public KeyCode throwKey = KeyCode.Mouse0;
@@ -36,16 +31,19 @@ public class ThrowingMechanic : MonoBehaviour
 
     // Power-up handling
     public static PowerUpType activePowerUp = PowerUpType.None;
-    private int powerUpShots = 3;
+    // private int powerUpShots = 3;
 
     void Start()
     {
+        AssignUIElements();
         readyToThrow = true;
         currentThrows = totalThrows;
         throwForce = baseThrowForce;
 
         // initialize UI
         shurikenUI.UpdateShurikenUI(currentThrows);
+        shurikenUI.ClearPowerUpUI();
+        playerMovement = GetComponent<PlayerMovement>();
     }
 
     private void Update()
@@ -60,31 +58,50 @@ public class ThrowingMechanic : MonoBehaviour
         }
     }
 
+    private void AssignUIElements()
+    {
+        // Find the ShurikenIcons GameObject
+        GameObject shurikenIconsObject = GameObject.Find("ShurikenIcons");
+
+        if (shurikenIconsObject != null)
+        {
+            // Get the Shuriken UI Manager from it
+            shurikenUI = shurikenIconsObject.GetComponent<ShurikenUIManager>();
+
+            if (shurikenUI != null)
+            {
+                // Assuming the first normal shuriken image is the one you need
+                discIconUI = shurikenUI.shurikenIcons[0];
+
+                Debug.Log("Shuriken UI Manager assigned successfully!");
+            }
+        }
+    }
     private void Throw()
     {
         if (currentThrows <= 0 || !readyToThrow) return;
-
         readyToThrow = false;
+        //  Reduce ammo count
+        currentThrows--;
 
-        //  Reduce ammo count properly
-        if (activePowerUp != PowerUpType.None)
-        {
-            powerUpShots--;
-            currentThrows--;
-            // If power-up shots are depleted, disable power-up
-            if (powerUpShots <= 0)
-            {
-                DisablePowerUp();
-            }
-        }
-        else
-        {
-            currentThrows--;
-            if (currentThrows == 0)
-            {
-                shurikenUI.ClearPowerUpUI();
-            }
-        }
+        // if (activePowerUp != PowerUpType.None)
+        // {
+        //     powerUpShots--;
+        //     Debug.Log("Power-up throw used. Remaining: " + currentThrows);
+        //     // If power-up shots are depleted, disable power-up
+        //     if (powerUpShots <= 0)
+        //     {
+        //         Debug.Log("Power-up shots depleted. Disabling power-up.");
+        //         DisablePowerUp();
+        //     }
+        // }
+        // else
+        // {
+        //     if (currentThrows == 0)
+        //     {
+        //         shurikenUI.ClearPowerUpUI();
+        //     }
+        // }
 
         //  Create a ray from the PlayerCam's position, facing forward
         Ray ray = new Ray(cam.position, cam.forward);
@@ -95,10 +112,12 @@ public class ThrowingMechanic : MonoBehaviour
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
 
         projectileRb.linearVelocity = forceDirection * throwForce;
-
-
         //  Update UI
         shurikenUI.UpdateShurikenUI(currentThrows);
+        if (currentThrows == 0)
+        {
+            shurikenUI.ClearPowerUpUI();
+        }
 
         //  Start reload if needed
         if (currentThrows <= 0 && !reloading)
@@ -134,24 +153,25 @@ public class ThrowingMechanic : MonoBehaviour
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
             projectileRb.linearVelocity = spreadDirection * throwForce;
 
-            //  Reduce ammo count properly based on power-up status
-            if (activePowerUp != PowerUpType.None)
-            {
-                currentThrows--;
-                powerUpShots--;
-                // If power-up shots are depleted, disable power-up
-                if (powerUpShots <= 0)
-                {
-                    DisablePowerUp();
-                }
-            }
-            else
-            {
-                currentThrows--;
-                {
-                    shurikenUI.ClearPowerUpUI();
-                }
-            }
+            // //  Reduce ammo count properly based on power-up status
+            // if (activePowerUp != PowerUpType.None)
+            // {
+            //     // currentThrows--;
+            //     powerUpShots--;
+            //     // If power-up shots are depleted, disable power-up
+            //     if (powerUpShots <= 0)
+            //     {
+            //         DisablePowerUp();
+            //     }
+            // }
+            // else
+            // {
+            //     currentThrows--;
+            //     {
+            //         shurikenUI.ClearPowerUpUI();
+            //     }
+            // }
+            currentThrows--;
 
             //  Update UI after each throw
             shurikenUI.UpdateShurikenUI(currentThrows);
@@ -159,7 +179,11 @@ public class ThrowingMechanic : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
         }
 
-        shurikenUI.ClearPowerUpUI();
+        if (currentThrows == 0)
+        {
+            shurikenUI.ClearPowerUpUI();
+        }
+
 
         //  Start reload if necessary
         if (currentThrows <= 0 && !reloading)
@@ -187,10 +211,10 @@ public class ThrowingMechanic : MonoBehaviour
         }
 
         // disable power-up when fully reloaded
-        if (activePowerUp != PowerUpType.None && currentThrows == totalThrows)
-        {
-            DisablePowerUp();
-        }
+        // if (activePowerUp != PowerUpType.None && currentThrows == totalThrows)
+        // {
+        //     DisablePowerUp();
+        // }
     }
 
     private void ResetThrow()
@@ -202,10 +226,10 @@ public class ThrowingMechanic : MonoBehaviour
     public void ActivatePowerUp(PowerUpType newPowerUp)
     {
         activePowerUp = newPowerUp;
-        powerUpShots = 3;
-        currentThrows = 3;
+        // powerUpShots = 3;
+        // currentThrows = 3;
 
-        shurikenUI.UpdateShurikenUI(currentThrows);
+        // shurikenUI.UpdateShurikenUI(currentThrows);
 
         switch (activePowerUp)
         {
@@ -215,11 +239,7 @@ public class ThrowingMechanic : MonoBehaviour
                 break;
             case PowerUpType.FreezeShot:
                 throwForce = baseThrowForce;
-
-                break;
-            case PowerUpType.FastFreezeShot:
-                throwForce = baseThrowForce * 4f;
-
+                playerMovement.groundDrag = 8;
                 break;
             case PowerUpType.PowerShot:
                 throwForce = baseThrowForce;
@@ -234,22 +254,25 @@ public class ThrowingMechanic : MonoBehaviour
         }
 
     }
-
     // Disable power-up
     private void DisablePowerUp()
     {
         activePowerUp = PowerUpType.None;
         throwForce = baseThrowForce;
         shurikenUI.ClearPowerUpUI(); // Clear power-up UI
+        shurikenUI.UpdateShurikenUI(currentThrows);
+        // if (currentThrows <= 0 && powerUpShots <= 0 && !reloading)
+        // {
+        //     reloading = true;
+        //     StartCoroutine(ReloadOneByOne());
+        // }
     }
-
     // Define Power-Up Types
     public enum PowerUpType
     {
         None,
         FastShot,
         FreezeShot,
-        FastFreezeShot,
         PowerShot,
         TripleShot
     }

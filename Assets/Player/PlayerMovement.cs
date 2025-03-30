@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     public float maxSpeed = 15f;
     public float airControl = 0.5f;
     public float airDrag = 1f;
-    public float groundDrag;
+    public float groundDrag = 4;
 
     [Header("Jump & Height Clamp")]
     public float maxHeight = 12f;
@@ -70,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(ThrowAnimation(true)); // Right-click special throw
         }
 
-        if (transform.position.y < groundY + -1f)
+        if (transform.position.y < 7f)
         {
             anim.SetBool("isFalling", true);
         }
