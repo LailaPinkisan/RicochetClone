@@ -50,7 +50,14 @@ public class ThrowingMechanic : MonoBehaviour
     {
         if (Input.GetKeyDown(throwKey) && readyToThrow && currentThrows > 0)
         {
-            Throw();
+            if (activePowerUp == PowerUpType.TripleShot)
+            {
+                TripleShot();
+            }
+            else
+            {
+                Throw();
+            }
         }
         else if (Input.GetKeyDown(threeKey) && currentThrows > 0)
         {
@@ -245,6 +252,7 @@ public class ThrowingMechanic : MonoBehaviour
                 throwForce = baseThrowForce;
                 break;
             case PowerUpType.TripleShot:
+
                 throwForce = baseThrowForce;
                 break;
             default:
@@ -255,6 +263,44 @@ public class ThrowingMechanic : MonoBehaviour
 
     }
     // Disable power-up
+    private void TripleShot()
+    {
+        if (currentThrows <= 0 || !readyToThrow) return;
+        readyToThrow = false;
+        currentThrows--; // Deduct only 1 bullet
+
+        float spreadAngle = 10f;
+        float spawnOffset = 2f;
+
+        for (int i = 0; i < 3; i++)
+        {
+            float angleOffset = (i - 1) * spreadAngle;
+            Quaternion rotationOffset = Quaternion.Euler(0, angleOffset, 0);
+            Vector3 spreadDirection = rotationOffset * cam.forward;
+
+            float heightOffset = (i == 1) ? 0.5f : 0f;
+            Vector3 spawnPosition = cam.position + cam.forward * spawnOffset;
+            spawnPosition.y += heightOffset;
+
+            GameObject projectile = Instantiate(shurikenPrefab, spawnPosition, Quaternion.LookRotation(spreadDirection));
+            Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
+            projectileRb.linearVelocity = spreadDirection * throwForce;
+        }
+
+        shurikenUI.UpdateShurikenUI(currentThrows);
+        if (currentThrows == 0)
+        {
+            shurikenUI.ClearPowerUpUI();
+        }
+
+        if (currentThrows <= 0 && !reloading)
+        {
+            reloading = true;
+            StartCoroutine(ReloadOneByOne());
+        }
+
+        Invoke(nameof(ResetThrow), throwCooldown);
+    }
     private void DisablePowerUp()
     {
         activePowerUp = PowerUpType.None;
