@@ -3,8 +3,9 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.UI;
+using Photon.Pun;
 
-public class ThrowingMechanic : MonoBehaviour
+public class ThrowingMechanic : MonoBehaviourPun
 {
     [Header("References")]
     public Transform cam;
@@ -12,6 +13,7 @@ public class ThrowingMechanic : MonoBehaviour
     public GameObject shurikenPrefab;
     public Image discIconUI;
     public ShurikenUIManager shurikenUI;
+
     public PlayerMovement playerMovement;
 
     [Header("Settings")]
@@ -113,11 +115,16 @@ public class ThrowingMechanic : MonoBehaviour
         //  Create a ray from the PlayerCam's position, facing forward
         Ray ray = new Ray(cam.position, cam.forward);
         Vector3 forceDirection = ray.direction;
-
+        if (!PhotonNetwork.InRoom) return; // Prevents instantiating too early
         // Instantiate the shuriken
-        GameObject projectile = Instantiate(shurikenPrefab, ray.origin, Quaternion.LookRotation(forceDirection));
+        GameObject projectile = PhotonNetwork.Instantiate("shurikenPrefab", ray.origin, Quaternion.LookRotation(forceDirection));
+        ProjectileAddOn projectileAddon = projectile.GetComponent<ProjectileAddOn>();
         Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
-
+        if (projectileAddon != null)
+        {
+            Debug.Log("Setting projectile power-up type to: " + activePowerUp);
+            projectileAddon.SetPowerUp(activePowerUp); // This must be called!
+        }
         projectileRb.linearVelocity = forceDirection * throwForce;
         //  Update UI
         shurikenUI.UpdateShurikenUI(currentThrows);
@@ -156,9 +163,11 @@ public class ThrowingMechanic : MonoBehaviour
             spawnPosition.y += heightOffset;
 
             //  Instantiate the disc!
-            GameObject projectile = Instantiate(shurikenPrefab, spawnPosition, Quaternion.LookRotation(spreadDirection));
+            GameObject projectile = PhotonNetwork.Instantiate("shurikenPrefab", spawnPosition, Quaternion.LookRotation(spreadDirection));
+            ProjectileAddOn projectileAddon = projectile.GetComponent<ProjectileAddOn>();
             Rigidbody projectileRb = projectile.GetComponent<Rigidbody>();
             projectileRb.linearVelocity = spreadDirection * throwForce;
+            projectileAddon?.SetPowerUp(activePowerUp); // Assign the current power-up to the disc
 
             // //  Reduce ammo count properly based on power-up status
             // if (activePowerUp != PowerUpType.None)
@@ -245,15 +254,13 @@ public class ThrowingMechanic : MonoBehaviour
                 Debug.Log("Fast Shot power-up activated! Throw force: " + throwForce);
                 break;
             case PowerUpType.FreezeShot:
-                throwForce = baseThrowForce;
-                playerMovement.groundDrag = 8;
+                throwForce = baseThrowForce * 1.8f;
                 break;
             case PowerUpType.PowerShot:
-                throwForce = baseThrowForce;
+                throwForce = baseThrowForce * 2.5f;
                 break;
             case PowerUpType.TripleShot:
-
-                throwForce = baseThrowForce;
+                throwForce = baseThrowForce * 2.5f;
                 break;
             default:
                 throwForce = baseThrowForce;

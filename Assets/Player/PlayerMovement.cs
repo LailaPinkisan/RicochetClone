@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviourPun
 {
     private Animator anim;
     private Collider playerCollider;
@@ -13,7 +14,7 @@ public class PlayerMovement : MonoBehaviour
     public float maxSpeed = 15f;
     public float airControl = 0.5f;
     public float airDrag = 1f;
-    public float groundDrag = 4;
+    public float groundDrag = 4f;
 
     [Header("Jump & Height Clamp")]
     public float maxHeight = 12f;
@@ -29,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
 
     Vector3 moveDirection;
 
-    Rigidbody rb;
+    private Rigidbody rb;
 
 
     void Start()
@@ -49,18 +50,24 @@ public class PlayerMovement : MonoBehaviour
         
         rb.freezeRotation = true;
     }
-
+    [PunRPC] //  Apply freeze to enemy
+    public void ApplyFreezeEffect(float newDrag)
+    {
+        groundDrag = newDrag;
+        rb.linearDamping = newDrag;
+        Invoke(nameof(ResetDrag), 3f); // Reset after 3 sec
+    }
+    void ResetDrag()
+    {
+        groundDrag = 5f;
+        rb.linearDamping = 5f;
+    }
     private void Update()
     {
         if (playerCollider != null)
         {
             grounded = Physics.Raycast(playerCollider.bounds.center, Vector3.down, playerCollider.bounds.extents.y + 0.1f, whatIsGround);
         }
-        else
-        {
-            Debug.LogError("Player Collider not found!");
-        }
-
         if (Input.GetMouseButtonDown(0)) // Left Click
         {
             StartCoroutine(ThrowAnimation(false)); // Normal throw
@@ -84,11 +91,7 @@ public class PlayerMovement : MonoBehaviour
         ClampHeight();
 
         UpdateAnimations();
-        // handle drag
-        if (grounded)
-            Debug.Log("Grounded");
-        else
-            Debug.Log("Airborne");
+
     }
     void FixedUpdate()
     {
@@ -122,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
             rb.AddForce(airMove, ForceMode.Force);
         }
     }
-
+    
     private void ApplyDrag()
     {
         // Apply ground or air drag...get horizontal velocity only 

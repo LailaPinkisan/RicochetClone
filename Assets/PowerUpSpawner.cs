@@ -1,7 +1,8 @@
 using System.Collections;
 using UnityEngine;
+using Photon.Pun;
 
-public class PowerUpSpawner : MonoBehaviour
+public class PowerUpSpawner : MonoBehaviourPun
 {
     public GameObject fastShotPrefab;
     public GameObject freezeShotPrefab;
@@ -15,8 +16,9 @@ public class PowerUpSpawner : MonoBehaviour
     private bool isSecondFloorOnCooldown = false;
     private bool alternatePowerUp = false;
 
-    void Start()
+    IEnumerator  Start()
     {
+        yield return new WaitUntil(() => PhotonNetwork.InRoom);
         // Start spawning loops
         StartCoroutine(SpawnFirstFloorPowerUps());
         StartCoroutine(SpawnSecondFloorPowerUps());
@@ -34,8 +36,7 @@ public class PowerUpSpawner : MonoBehaviour
                 GameObject powerUpToSpawn = (Random.value > 0.5f) ? freezeShotPrefab : fastShotPrefab;
 
                 Transform spawnPoint = firstFloorSpawns[Random.Range(0, firstFloorSpawns.Length)];
-                GameObject spawnedPowerUp = Instantiate(powerUpToSpawn, spawnPoint.position, Quaternion.identity);
-
+                GameObject spawnedPowerUp = PhotonNetwork.Instantiate(powerUpToSpawn.name, spawnPoint.position, Quaternion.identity);
                 PowerUp powerUpScript = spawnedPowerUp.GetComponent<PowerUp>();
                 if (powerUpScript != null)
                 {
@@ -68,7 +69,7 @@ public class PowerUpSpawner : MonoBehaviour
                 alternatePowerUp = !alternatePowerUp;
 
                 Transform spawnPoint = secondFloorSpawns[Random.Range(0, secondFloorSpawns.Length)];
-                GameObject spawnedPowerUp = Instantiate(powerUpToSpawn, spawnPoint.position, Quaternion.identity);
+                GameObject spawnedPowerUp = PhotonNetwork.Instantiate(powerUpToSpawn.name, spawnPoint.position, Quaternion.identity);
 
                 PowerUp powerUpScript = spawnedPowerUp.GetComponent<PowerUp>();
                 if (powerUpScript != null)
