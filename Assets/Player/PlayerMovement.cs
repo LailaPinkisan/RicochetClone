@@ -47,7 +47,7 @@ public class PlayerMovement : MonoBehaviourPun
 
         // Get the Collider from the player object (child of the empty GameObject)
         playerCollider = GetComponentInChildren<Collider>();
-        
+
         rb.freezeRotation = true;
     }
     [PunRPC] //  Apply freeze to enemy
@@ -67,6 +67,24 @@ public class PlayerMovement : MonoBehaviourPun
         if (playerCollider != null)
         {
             grounded = Physics.Raycast(playerCollider.bounds.center, Vector3.down, playerCollider.bounds.extents.y + 0.1f, whatIsGround);
+        }
+
+        float playerY = transform.position.y;
+        float verticalVelocity = rb.linearVelocity.y;
+        if (playerY < 7f)
+        {
+            anim.SetBool("isFalling", true);
+            anim.SetBool("isJumpingDown", false);
+        }
+        else if (verticalVelocity < -0.1f) // Player is moving downward
+        {
+            anim.SetBool("isJumpingDown", true);
+            anim.SetBool("isFalling", false);
+        }
+        else
+        {
+            anim.SetBool("isJumpingDown", false);
+            anim.SetBool("isFalling", false);
         }
         if (Input.GetMouseButtonDown(0)) // Left Click
         {
@@ -125,7 +143,7 @@ public class PlayerMovement : MonoBehaviourPun
             rb.AddForce(airMove, ForceMode.Force);
         }
     }
-    
+
     private void ApplyDrag()
     {
         // Apply ground or air drag...get horizontal velocity only 
